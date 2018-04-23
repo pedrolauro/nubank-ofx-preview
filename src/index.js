@@ -6,7 +6,6 @@ import moment from 'moment';
 import chrono from 'chrono-node';
 import inquirer from 'inquirer';
 import puppeteer from 'puppeteer';
-import objectHash from 'object-hash';
 
 
 const mainCommand = {
@@ -143,14 +142,14 @@ async function main(options) {
                 bill.line_items.map(i =>
                     asCharge(i, bill.state, timezoneOffset, detailed))),
             []
-        )
-        .filter(charge =>
-            isBetween(
-                charge.date,
-                since,
-                until,
-                charge.billState
-            )
+        // )
+        // .filter(charge =>
+        //     isBetween(
+        //         charge.date,
+        //         since,
+        //         until,
+        //         charge.billState
+        //     )
         );
 
     const output = (
@@ -161,7 +160,7 @@ async function main(options) {
     const outputPath = (
         requestedOutputPath !== null
             ? requestedOutputPath
-            : defaultOutputPath(bills, fileFormat)
+            : defaultOutputPath(bills, username, fileFormat)
     );
 
     await writeToFile(output, outputPath);
@@ -218,9 +217,8 @@ function isBetween(dt, since, until, billState) {
     return moment(dt).isBetween(moment(sinceDate), moment(untilDate));
 }
 
-function defaultOutputPath(bills, format) {
-    const name = objectHash(bills);
-    return `./nubank-${sh.unique(name)}.${format}`;
+function defaultOutputPath(bills, username, format) {
+    return `./nubank-${username}.${format}`;
 }
 
 const baseUrl = 'https://app.nubank.com.br';
